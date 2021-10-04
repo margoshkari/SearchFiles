@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Server
 {
@@ -32,7 +35,22 @@ namespace Server
                 serverData.socketClient = serverData.socket.Accept();
                 serverData.socketClientsList.Add(serverData.socketClient);
 
-                serverData.socketClient.Send(Encoding.Unicode.GetBytes("Welcome on server!"));
+                serverData.socketClient.Send(Encoding.Unicode.GetBytes("Welcome on server!^"));
+
+                SearchApps();
+            }
+        }
+
+        static void SearchApps()
+        {
+            List<string> files = new List<string>();
+            files = Directory.GetFiles(@$"C:\Users\" + $"{Environment.UserName}" + @"\Desktop", "*", SearchOption.AllDirectories).ToList();
+
+            serverData.socketClient.Send(Encoding.Unicode.GetBytes("Your apps:^"));
+            serverData.socketClient.Send(Encoding.Unicode.GetBytes($"{files.Count()}^"));
+            foreach (var item in files)
+            {
+                serverData.socketClient.Send(Encoding.Unicode.GetBytes($"{Path.GetFileName(item)}^"));
             }
         }
     }
