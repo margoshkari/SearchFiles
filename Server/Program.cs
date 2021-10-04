@@ -13,7 +13,6 @@ namespace Server
     class Program
     {
         static ServerData serverData = new ServerData();
-        static bool isStartNewTask = true;
         static void Main(string[] args)
         {
             Console.WriteLine("Start server...");
@@ -22,15 +21,7 @@ namespace Server
                 serverData.socket.Bind(serverData.iPEndPoint);
                 serverData.socket.Listen(10);
 
-                 Task.Factory.StartNew(() => Connect());
-                //while(true)
-                //{
-                //    if (isStartNewTask && serverData.socketClient != null)
-                //    {
-                //        Task.Factory.StartNew(() => StartApp());
-                //        isStartNewTask = false;
-                //    }
-                //}
+                Task.Factory.StartNew(() => Connect());
             }
             catch (Exception ex)
             {
@@ -44,7 +35,6 @@ namespace Server
             {
                 serverData.socketClient = serverData.socket.Accept();
                 serverData.socketClientsList.Add(serverData.socketClient);
-
 
                 SearchApps();
                 StartApp();
@@ -64,7 +54,7 @@ namespace Server
                 if (item.Contains(appName))
                     path = Path.GetDirectoryName(item);
             }
-           
+
             Process.Start(new ProcessStartInfo(path + @$"\{appName}")
             {
                 UseShellExecute = true

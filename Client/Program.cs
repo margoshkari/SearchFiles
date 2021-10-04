@@ -29,11 +29,7 @@ namespace Client
         static void GetFiles()
         {
             messages = clientData.GetMsg().Split("\n").ToList();
-            
-            for (int i = 0; i < messages.Count(); i++)
-            {
-                Console.WriteLine(messages[i]);
-            }
+            messages.ForEach(Console.WriteLine);
         }
         static void StartApp()
         {
