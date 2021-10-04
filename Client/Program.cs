@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Client
@@ -16,26 +17,20 @@ namespace Client
             {
                 clientData.socket.Connect(clientData.iPEndPoint);
 
-                messages = clientData.GetMsg().Split("^").ToList();
-                Console.WriteLine(messages[0]);
-
                 GetFiles();
                 StartApp();
-
-                Console.ReadLine();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+            Console.ReadLine();
         }
         static void GetFiles()
         {
-            messages = clientData.GetMsg().Split("^").ToList();
-            Console.WriteLine(messages[0]);
-            int filesCount = int.Parse(messages[1]);
+            messages = clientData.GetMsg().Split("\n").ToList();
             
-            for (int i = messages.IndexOf(filesCount.ToString()) + 1; i < messages.Count(); i++)
+            for (int i = 0; i < messages.Count(); i++)
             {
                 Console.WriteLine(messages[i]);
             }

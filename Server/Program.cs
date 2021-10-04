@@ -13,6 +13,7 @@ namespace Server
     class Program
     {
         static ServerData serverData = new ServerData();
+        static bool isStartNewTask = true;
         static void Main(string[] args)
         {
             Console.WriteLine("Start server...");
@@ -21,7 +22,15 @@ namespace Server
                 serverData.socket.Bind(serverData.iPEndPoint);
                 serverData.socket.Listen(10);
 
-                Connect();
+                 Task.Factory.StartNew(() => Connect());
+                //while(true)
+                //{
+                //    if (isStartNewTask && serverData.socketClient != null)
+                //    {
+                //        Task.Factory.StartNew(() => StartApp());
+                //        isStartNewTask = false;
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -36,29 +45,26 @@ namespace Server
                 serverData.socketClient = serverData.socket.Accept();
                 serverData.socketClientsList.Add(serverData.socketClient);
 
-                serverData.socketClient.Send(Encoding.Unicode.GetBytes("Welcome on server!^"));
 
                 SearchApps();
                 StartApp();
             }
         }
-
         static void SearchApps()
         {
-            List<string> files = new List<string>();
-            files = Directory.GetFiles(@$"C:\Users\" + $"{Environment.UserName}" + @"\Desktop", "*.lnk", SearchOption.AllDirectories).ToList();
-
-            serverData.socketClient.Send(Encoding.Unicode.GetBytes("Your apps:^"));
-            serverData.socketClient.Send(Encoding.Unicode.GetBytes($"{files.Count()}^"));
-            foreach (var item in files)
-            {
-                serverData.socketClient.Send(Encoding.Unicode.GetBytes($"{Path.GetFileName(item)}^"));
-            }
+            string[] tmp = Directory.GetFiles(@$"C:\Users\" + $"{Environment.UserName}" + @"\Desktop", "*", SearchOption.AllDirectories);
+            serverData.SendMsg(tmp);
         }
         static void StartApp()
         {
             string appName = serverData.GetMsg();
-            string path = Path.GetDirectoryName(Directory.GetFiles(@$"C:\Users\" + $"{Environment.UserName}" + @"\Desktop", "*", SearchOption.AllDirectories).ToList().First());
+            string path = string.Empty;
+            foreach (var item in Directory.GetFiles(@$"C:\Users\" + $"{Environment.UserName}" + @"\Desktop", "*", SearchOption.AllDirectories).ToList())
+            {
+                if (item.Contains(appName))
+                    path = Path.GetDirectoryName(item);
+            }
+           
             Process.Start(new ProcessStartInfo(path + @$"\{appName}")
             {
                 UseShellExecute = true

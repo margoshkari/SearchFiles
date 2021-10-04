@@ -17,7 +17,7 @@ namespace Server
         public IPEndPoint iPEndPoint;
         public ServerData()
         {
-            data = new byte[256];
+            data = new byte[1024];
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             iPEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8000);
             socketClientsList = new List<Socket>();
@@ -33,13 +33,25 @@ namespace Server
         {
             int bytes = 0;
             StringBuilder stringBuilder = new StringBuilder();
-            do
+            try
             {
-                bytes = socketClient.Receive(data);
-                stringBuilder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-            } while (socketClient.Available > 0);
-
+                do
+                {
+                    bytes = socketClient.Receive(data);
+                    stringBuilder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+                } while (socketClient.Available > 0);
+            }
+            catch (Exception ex) { }
             return stringBuilder.ToString();
+        }
+        public void SendMsg(string[] sms)
+        {
+            string outstr = String.Empty;
+            foreach (var item in sms)
+            {
+                data = Encoding.Unicode.GetBytes(outstr += $"{Path.GetFileName(item)}\n");
+            }
+            socketClient.Send(data);
         }
     }
 }
