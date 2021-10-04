@@ -19,7 +19,8 @@ namespace Client
                 messages = clientData.GetMsg().Split("^").ToList();
                 Console.WriteLine(messages[0]);
 
-                GetFiles(); 
+                GetFiles();
+                StartApp();
 
                 Console.ReadLine();
             }
@@ -33,11 +34,22 @@ namespace Client
             messages = clientData.GetMsg().Split("^").ToList();
             Console.WriteLine(messages[0]);
             int filesCount = int.Parse(messages[1]);
-
+            
             for (int i = messages.IndexOf(filesCount.ToString()) + 1; i < messages.Count(); i++)
             {
                 Console.WriteLine(messages[i]);
             }
         }
-        
+        static void StartApp()
+        {
+            string appName = string.Empty;
+            Console.WriteLine("Enter name of app you want to start:");
+            do
+            {
+                appName = Console.ReadLine();
+            } while (!messages.Contains(appName));
+
+            clientData.socket.Send(Encoding.Unicode.GetBytes(appName));
+        }
+    }
 }

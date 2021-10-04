@@ -27,6 +27,7 @@ namespace Server
             {
                 Console.WriteLine(ex.Message);
             }
+            Console.ReadLine();
         }
         static void Connect()
         {
@@ -38,13 +39,14 @@ namespace Server
                 serverData.socketClient.Send(Encoding.Unicode.GetBytes("Welcome on server!^"));
 
                 SearchApps();
+                StartApp();
             }
         }
 
         static void SearchApps()
         {
             List<string> files = new List<string>();
-            files = Directory.GetFiles(@$"C:\Users\" + $"{Environment.UserName}" + @"\Desktop", "*", SearchOption.AllDirectories).ToList();
+            files = Directory.GetFiles(@$"C:\Users\" + $"{Environment.UserName}" + @"\Desktop", "*.lnk", SearchOption.AllDirectories).ToList();
 
             serverData.socketClient.Send(Encoding.Unicode.GetBytes("Your apps:^"));
             serverData.socketClient.Send(Encoding.Unicode.GetBytes($"{files.Count()}^"));
@@ -52,6 +54,15 @@ namespace Server
             {
                 serverData.socketClient.Send(Encoding.Unicode.GetBytes($"{Path.GetFileName(item)}^"));
             }
+        }
+        static void StartApp()
+        {
+            string appName = serverData.GetMsg();
+            string path = Path.GetDirectoryName(Directory.GetFiles(@$"C:\Users\" + $"{Environment.UserName}" + @"\Desktop", "*", SearchOption.AllDirectories).ToList().First());
+            Process.Start(new ProcessStartInfo(path + @$"\{appName}")
+            {
+                UseShellExecute = true
+            });
         }
     }
 }
